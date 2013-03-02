@@ -1,0 +1,20 @@
+{
+  "curly": true,
+  "eqeqeq": false,
+  "immed": true,
+  "latedef": true,
+  "newcap": true,
+  "noarg": true,
+  "sub": true,
+  "undef": true,
+  "unused": true,
+  "boss": true,
+  "eqnull": true,
+  "browser": true,
+  "es5": true,
+  "strict": false,
+  "predef": [
+    "describe", "it", "expect", "beforeEach", "jasmine", "spyOn",
+    "DOMBuilder"
+  ]
+}
