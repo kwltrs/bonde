@@ -51,21 +51,26 @@ var Bonde = this.Bonde || {};
           obj.$('[data-attach-to]').each(function () {
               var $this = $(this);
               var attachName = $this.data('attach-to');
-              obj[attachName] = this;
-              obj['$'+attachName] = $this;
-
-              obj.attr.set(attachName, $this.text());
-              obj.attr.on('change', function (key, value) {
-                  if (key == attachName) {
-                      $this.text(value);
-                  }
-              });
+              attachJqueryNode(obj, attachName, $this);
           });
       }
 
+      function attachJqueryNode (obj, attachName, $el) {
+          obj['$'+attachName] = $el;
+          obj[attachName]     = $el.get(0);
+
+          obj.attr.set(attachName, $el.text());
+          obj.attr.on('change', function (key, value) {
+              if (key == attachName) {
+                  $el.text(value);
+              }
+          });
+      }
+
+
       function ModuleContext (element) {
-          this.el = element;
           this.$el = $(element);
+          this.el  = this.$el.get(0);
           this.options = this.$el.data();
           this.attr = new B.AttributeHolder();
 
@@ -74,6 +79,13 @@ var Bonde = this.Bonde || {};
 
       ModuleContext.prototype.$ = function (selector) {
           return this.$el.find(selector);
+      };
+
+      ModuleContext.prototype.attach = function (attachName, selector) {
+          var $el = this.$(selector);
+          if ($el.length > 0) {
+              attachJqueryNode(this, attachName, $el);
+          }
       };
 
       return ModuleContext;

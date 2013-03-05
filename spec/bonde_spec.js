@@ -96,7 +96,8 @@ describe('Bonde', function () {
 
             this.fooNode = DOMBuilder.createElement('span', {'data-attach-to': 'foo'}, 'bar');
             this.fizNode = DOMBuilder.createElement('span', {'data-attach-to': 'fiz'}, 'baz');
-            this.el      = DOMBuilder.createElement('div', {}, [this.fooNode, this.fizNode]);
+            this.fusNode = DOMBuilder.createElement('span', {'id': 'fus'}, 'fus content');
+            this.el      = DOMBuilder.createElement('div', {}, [this.fooNode, this.fizNode, this.fusNode]);
 
             this.moduleContext = new Bonde.ModuleContext( this.el );
         });
@@ -181,6 +182,45 @@ describe('Bonde', function () {
                 it('trigger event listener', function () {
                     this.moduleContext.attr.set('ftw', 'any string');
                     expect( this.callback ).toHaveBeenCalledWith('ftw', 'any string', undefined);
+                });
+            });
+
+            describe('attach node manually', function () {
+                beforeEach(function () {
+                    this.moduleContext.attach('fus', '#fus');
+                });
+
+                it("creates refernce to dom node", function () {
+                    expect( this.moduleContext.fus ).toBeDefined();
+                    expect( this.moduleContext.fus ).toEqual( this.fusNode );
+                });
+
+                it("creates refernce to jQueriefied node", function () {
+                    expect( this.moduleContext.$fus ).toBeDefined();
+                    expect( this.moduleContext.$fus.jquery ).toBeDefined();
+                    expect( this.moduleContext.$fus.get(0) ).toEqual( this.fusNode );
+                });
+
+                it("adds node value to attribute map", function () {
+                    expect( this.moduleContext.attr.get('fus') ).toEqual('fus content');
+                });
+            });
+
+            describe('attach non-existing node manually', function () {
+                beforeEach(function () {
+                    this.moduleContext.attach('xxx', '#xxx');
+                });
+
+                it("creates no dom node refernce", function () {
+                    expect( this.moduleContext.xxx ).not.toBeDefined();
+                });
+
+                it("creates no jQueried refernce", function () {
+                    expect( this.moduleContext.$xxx ).not.toBeDefined();
+                });
+
+                it("adds no value to attribute map", function () {
+                    expect( this.moduleContext.attr.get('xxx') ).toBeUndefined();
                 });
             });
         });
