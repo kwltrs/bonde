@@ -107,7 +107,9 @@ var Bonde = this.Bonde || {};
           return;
       }
 
-      modules[moduleName].call(new B.ModuleContext(element));
+      var ctx = new B.ModuleContext(element);
+      modules[moduleName].call(ctx);
+      return ctx;
   };
 
   B.scanForModules = function (node) {

@@ -28,14 +28,21 @@ describe('Bonde', function () {
             Bonde.registerModule('myModule', this.callback);
         });
 
-        it("calls a registered module's callback", function () {
+        it("calls a callback for given module name", function () {
             Bonde.applyModule('myModule', this.el);
             expect( this.callback ).toHaveBeenCalled();
         });
 
-        it("calls a registered module's callback", function () {
+        it("does not call callback with other module name", function () {
             Bonde.applyModule('NOT-myModule', this.el);
             expect( this.callback ).not.toHaveBeenCalled();
+        });
+
+        it("returns a module's context object", function () {
+            var ctx = Bonde.applyModule('myModule', this.el);
+            expect( ctx ).toBeDefined();
+            expect( ctx.el ).toBe( this.el );
+
         });
     });
 
