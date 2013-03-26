@@ -234,6 +234,26 @@ describe('Bonde', function () {
     });
 
 
+    describe('Bonde.ModuleContext mixin', function () {
+        beforeEach(function () {
+            this.moduleContext = new Bonde.ModuleContext( DOMBuilder.createElement('div') );
+            this.moduleContext.mixin({
+                foo: "foo value",
+                bar: function () { return "bar called"; }
+            });
+        });
+
+        it("adds properties", function () {
+            expect( this.moduleContext.foo ).toEqual('foo value');
+        });
+
+        it("adds methods", function () {
+            expect( this.moduleContext.bar() ).toEqual('bar called');
+        });
+
+    });
+
+
 
     describe('Bonde.scanForModules', function () {
         it('applies module callback to all module dom nodes', function () {

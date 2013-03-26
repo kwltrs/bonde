@@ -88,6 +88,14 @@ var Bonde = this.Bonde || {};
           }
       };
 
+      ModuleContext.prototype.mixin = function (obj) {
+          for (var k in obj) {
+              if (obj.hasOwnProperty(k)) {
+                  this[k] = obj[k];
+              }
+          }
+      };
+
       return ModuleContext;
   }());
 
