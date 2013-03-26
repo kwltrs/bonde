@@ -12,6 +12,14 @@ var Bonde = this.Bonde || {};
 
   'use strict';
 
+  function mixin(dest, src) {
+      for (var k in src) {
+          if (src.hasOwnProperty(k)) {
+              dest[k] = src[k];
+          }
+      }
+  }
+
   B.AttributeHolder = (function () {
       function notifyChange(attrHolder, key, newValue, oldValue) {
           var listeners = attrHolder.changeListeners;
@@ -88,6 +96,10 @@ var Bonde = this.Bonde || {};
           }
       };
 
+      ModuleContext.prototype.mixin = function (obj) {
+          mixin(this, obj);
+      };
+
       return ModuleContext;
   }());
 
@@ -96,6 +108,10 @@ var Bonde = this.Bonde || {};
 
   B.registerModule = function (moduleName, moduleCallback) {
       modules[moduleName] = moduleCallback;
+  };
+
+  B.registerModules = function (moduleMap) {
+      mixin(modules, moduleMap);
   };
 
   B.reset = function () {

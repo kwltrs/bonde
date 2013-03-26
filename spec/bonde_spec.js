@@ -47,6 +47,29 @@ describe('Bonde', function () {
     });
 
 
+    describe('Bonde.registeModules', function () {
+        beforeEach(function () {
+            this.el = DOMBuilder.createElement('div');
+            this.callbackA = jasmine.createSpy();
+            this.callbackB = jasmine.createSpy();
+
+            Bonde.registerModules({
+                moduleA: this.callbackA,
+                moduleB: this.callbackB
+            });
+        });
+
+        it("calls callback for module B", function () {
+            Bonde.applyModule('moduleA', this.el);
+            expect( this.callbackA ).toHaveBeenCalled();
+        });
+
+        it("calls callback for module B", function () {
+            Bonde.applyModule('moduleB', this.el);
+            expect( this.callbackB ).toHaveBeenCalled();
+        });
+    });
+
 
     describe('Bonde.reset', function () {
         it('unregisters modules', function () {
@@ -231,6 +254,26 @@ describe('Bonde', function () {
                 });
             });
         });
+    });
+
+
+    describe('Bonde.ModuleContext mixin', function () {
+        beforeEach(function () {
+            this.moduleContext = new Bonde.ModuleContext( DOMBuilder.createElement('div') );
+            this.moduleContext.mixin({
+                foo: "foo value",
+                bar: function () { return "bar called"; }
+            });
+        });
+
+        it("adds properties", function () {
+            expect( this.moduleContext.foo ).toEqual('foo value');
+        });
+
+        it("adds methods", function () {
+            expect( this.moduleContext.bar() ).toEqual('bar called');
+        });
+
     });
 
 
