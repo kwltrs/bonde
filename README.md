@@ -40,6 +40,8 @@ jQuery(function () {
 
 Register a callback with a given name.  Name can be anything that fits into a string, but it should be unique.
 
+### Bonde.registerModules(moduleMap)
+
 ### Bonde.applyModule(moduleName, DOMNode)
 
 Execute a callback in context.

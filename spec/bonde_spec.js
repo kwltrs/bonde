@@ -47,6 +47,29 @@ describe('Bonde', function () {
     });
 
 
+    describe('Bonde.registeModules', function () {
+        beforeEach(function () {
+            this.el = DOMBuilder.createElement('div');
+            this.callbackA = jasmine.createSpy();
+            this.callbackB = jasmine.createSpy();
+
+            Bonde.registerModules({
+                moduleA: this.callbackA,
+                moduleB: this.callbackB
+            });
+        });
+
+        it("calls callback for module B", function () {
+            Bonde.applyModule('moduleA', this.el);
+            expect( this.callbackA ).toHaveBeenCalled();
+        });
+
+        it("calls callback for module B", function () {
+            Bonde.applyModule('moduleB', this.el);
+            expect( this.callbackB ).toHaveBeenCalled();
+        });
+    });
+
 
     describe('Bonde.reset', function () {
         it('unregisters modules', function () {
