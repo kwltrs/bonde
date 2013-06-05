@@ -62,6 +62,14 @@ module.exports = function(grunt) {
         src: ['spec/**/*_spec.js']
       },
     },
+    jsdoc: {
+      dist: {
+        src: ['README.md', 'src/**/*.js'],
+        options: {
+          destination: 'api'
+        }
+      }
+    },
     watch: {
       gruntfile: {
         files: '<%= jshint.gruntfile.src %>',
@@ -85,8 +93,9 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-connect');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-jsdoc');
 
   // Default task.
-  grunt.registerTask('default', ['jshint', 'jasmine', 'concat', 'uglify']);
+  grunt.registerTask('default', ['jshint', 'jasmine', 'concat', 'uglify', 'jsdoc']);
 
 };
