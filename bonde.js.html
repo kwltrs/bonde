@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: bonde.js</title>
+    
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+    
+    <h1 class="page-title">Source: bonde.js</h1>
+    
+    
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source"><code>/*
+ * Bonde
+ * https://github.com/kwltrs/bonde
+ *
+ * Copyright (c) 2013 Kristofer Walters
+ * Licensed under the MIT license.
+ */
+
+/** @namespace */
+var Bonde = this.Bonde || {};
+
+(function(B, $) {
+  'use strict';
+
+  function mixin(dest, src) {
+      for (var k in src) {
+          if (src.hasOwnProperty(k)) {
+              dest[k] = src[k];
+          }
+      }
+  }
+
+  B.AttributeHolder = (function () {
+
+      /**
+       * Notify all listeners of a given AttributeHolder instance.
+       * @private
+       */
+      function notifyChange(attrHolder, key, newValue, oldValue) {
+          var listeners = attrHolder.changeListeners;
+          for (var i=0, len=listeners.length; i&lt;len; i++) {
+              listeners[i].call(attrHolder, key, newValue, oldValue);
+          }
+      }
+
+      /**
+       * @event Bonde.AttributeHolder~onChangeEvent
+       */
+      /**
+       * @callback Bonde.AttributeHolder~onChangeCallback
+       * @param {string} key
+       * @param {string} newValue
+       * @param {string} oldValue
+       */
+
+      /**
+       * Event-firing key-value store.
+       * @class Bonde.AttributeHolder
+       */
+      function AttributeHolder () {
+          this.values = {};
+          this.changeListeners = [];
+      }
+
+      /**
+       * @method Bonde.AttributeHolder#get
+       * @param {string} key
+       */
+      AttributeHolder.prototype.get = function (key) {
+          return this.values[key];
+      };
+
+      /**
+       * @method Bonde.AttributeHolder#set
+       * @param {string} key
+       * @param {string} value
+       * @fires Bonde.AttributeHolder~onChangeEvent
+       */
+      AttributeHolder.prototype.set = function (key, value) {
+          var oldValue = this.values[key];
+          this.values[key] = value;
+          notifyChange(this, key, value, oldValue);
+      };
+
+      /**
+       * @method Bonde.AttributeHolder#on
+       * @param {string} eventName
+       * @param {Bonde.AttributeHolder~onChangeCallback} listener
+       */
+      AttributeHolder.prototype.on = function (eventName, listener) {
+          if (eventName == 'change') {
+              this.changeListeners.push( listener );
+          }
+      };
+
+      return AttributeHolder;
+  }());
+
+  B.ModuleContext = (function () {
+
+      function attachNodes (obj) {
+          obj.$('[data-attach-to]').each(function () {
+              var $this = $(this);
+              var attachName = $this.data('attach-to');
+              attachJqueryNode(obj, attachName, $this);
+          });
+      }
+
+      function attachJqueryNode (obj, attachName, $el) {
+          obj['$'+attachName] = $el;
+          obj[attachName]     = $el.get(0);
+
+          obj.attr.set(attachName, $el.text());
+          obj.attr.on('change', function (key, value) {
+              if (key == attachName) {
+                  $el.text(value);
+              }
+          });
+      }
+
+
+      /**
+       * @class Bonde.ModuleContext
+       * @param {DOMElement} element
+       */
+      function ModuleContext (element) {
+          this.$el = $(element);
+          this.el  = this.$el.get(0);
+          this.options = this.$el.data();
+          this.attr = new B.AttributeHolder();
+
+          attachNodes(this);
+      }
+
+      /**
+       * @method Bonde.ModuleContext#$
+       * @param {string} selector
+       */
+      ModuleContext.prototype.$ = function (selector) {
+          return this.$el.find(selector);
+      };
+
+      /**
+       * @method Bonde.ModuleContext#attach
+       * @param {string} attachName
+       * @param {string} selector
+       */
+      ModuleContext.prototype.attach = function (attachName, selector) {
+          var $el = this.$(selector);
+          if ($el.length > 0) {
+              attachJqueryNode(this, attachName, $el);
+          }
+      };
+
+      /**
+       * Mixin properties from given object into self.
+       * @method Bonde.ModuleContext#mixin
+       * @param {object} obj
+       */
+      ModuleContext.prototype.mixin = function (obj) {
+          mixin(this, obj);
+      };
+
+      return ModuleContext;
+  }());
+
+
+  var modules = [];
+
+  /**
+   * @method Bonde.registerModule
+   * @param {string} moduleName
+   * @param {callback} moduleCallback
+   */
+  B.registerModule = function (moduleName, moduleCallback) {
+      modules[moduleName] = moduleCallback;
+  };
+
+  /**
+   * @method Bonde.registerModules
+   * @param {hash} moduleMap
+   */
+  B.registerModules = function (moduleMap) {
+      mixin(modules, moduleMap);
+  };
+
+  /**
+   * @method Bonde.reset
+   */
+  B.reset = function () {
+      modules = [];
+  };
+
+  /**
+   * @method Bonde.applyModule
+   * @param {string} moduleName
+   * @param {DOMNode} element
+   */
+  B.applyModule = function (moduleName, element) {
+      if (!modules[moduleName]) {
+          return;
+      }
+
+      var ctx = new B.ModuleContext(element);
+      modules[moduleName].call(ctx);
+      return ctx;
+  };
+
+  /**
+   * @method Bonde.scanForModules
+   * @param {DOMElement} node
+   */
+  B.scanForModules = function (node) {
+      $(node).find('[data-module]').each(function () {
+          var moduleName = $(this).data('module');
+          B.applyModule(moduleName, this);
+      });
+  };
+
+}(Bonde, jQuery));
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Index</a></h2><h3>Classes</h3><ul><li><a href="Bonde.AttributeHolder.html">AttributeHolder</a></li><li><a href="Bonde.ModuleContext.html">ModuleContext</a></li></ul><h3>Events</h3><ul><li><a href="Bonde.AttributeHolder.html#event:onChangeEvent">onChangeEvent</a></li></ul><h3>Namespaces</h3><ul><li><a href="Bonde.html">Bonde</a></li></ul>
+</nav>
+
+<br clear="both">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.2.0-dev</a> on Thu Jun 06 2013 10:22:14 GMT+0200 (CEST)
+</footer>
+
+<script> prettyPrint(); </script>
+</body>
+</html>
