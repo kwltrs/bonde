@@ -45,6 +45,10 @@ module.exports = function(grunt) {
         }
       }
     },
+    clean: {
+      dist: ['dist'],
+      api: ['api']
+    },
     jshint: {
       options: {
         jshintrc: '.jshintrc'
@@ -94,6 +98,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-jsdoc');
+  grunt.loadNpmTasks('grunt-contrib-clean');
 
   // Default task.
   grunt.registerTask('default', ['jshint', 'jasmine', 'concat', 'uglify', 'jsdoc']);
