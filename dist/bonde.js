@@ -1,4 +1,4 @@
-/*! bonde - v0.0.3 - 2013-06-06
+/*! bonde - v0.0.4 - 2013-06-10
 * https://github.com/kwltrs/bonde
 * Copyright (c) 2013 Kristofer Walters; Licensed MIT */
 /** @namespace */
@@ -7,6 +7,7 @@ var Bonde = this.Bonde || {};
 (function(B, $) {
   'use strict';
 
+  /** Helper */
   function mixin(dest, src) {
       for (var k in src) {
           if (src.hasOwnProperty(k)) {
@@ -32,10 +33,10 @@ var Bonde = this.Bonde || {};
        * @event Bonde.AttributeHolder~onChangeEvent
        */
       /**
-       * @callback Bonde.AttributeHolder~onChangeCallback
-       * @param {string} key
-       * @param {string} newValue
-       * @param {string} oldValue
+       * @callback Bonde.AttributeHolder~OnChangeCallback
+       * @param {string} key        Name of the changed property
+       * @param {string} newValue   Current value of the property
+       * @param {string} oldValue   Former value of the property
        */
 
       /**
@@ -70,7 +71,7 @@ var Bonde = this.Bonde || {};
       /**
        * @method Bonde.AttributeHolder#on
        * @param {string} eventName
-       * @param {Bonde.AttributeHolder~onChangeCallback} listener
+       * @param {Bonde.AttributeHolder~OnChangeCallback} listener
        */
       AttributeHolder.prototype.on = function (eventName, listener) {
           if (eventName == 'change') {
@@ -83,6 +84,9 @@ var Bonde = this.Bonde || {};
 
   B.ModuleContext = (function () {
 
+      /**
+       * @function Bonde.ModuleContext~attachNodes
+       */
       function attachNodes (obj) {
           obj.$('[data-attach-to]').each(function () {
               var $this = $(this);
@@ -91,6 +95,9 @@ var Bonde = this.Bonde || {};
           });
       }
 
+      /**
+       * @function Bonde.ModuleContext~atachJqueryNodes
+       */
       function attachJqueryNode (obj, attachName, $el) {
           obj['$'+attachName] = $el;
           obj[attachName]     = $el.get(0);
@@ -109,9 +116,21 @@ var Bonde = this.Bonde || {};
        * @param {DOMElement} element
        */
       function ModuleContext (element) {
+          /**
+           * @member {jQuery} Bonde.ModuleContext#$el
+           */
           this.$el = $(element);
+          /**
+           * @member {DOMElement} Bonde.ModuleContext#el
+           */
           this.el  = this.$el.get(0);
+          /**
+           * @member {object} Bonde.ModuleContext#options
+           */
           this.options = this.$el.data();
+          /**
+           * @member {Bonde.AttributeHolder} Bonde.ModuleContext#attr
+           */
           this.attr = new B.AttributeHolder();
 
           attachNodes(this);
@@ -150,12 +169,22 @@ var Bonde = this.Bonde || {};
   }());
 
 
-  var modules = [];
+  /**
+   * Registry for module callbacks.
+   */
+  var modules = {};
+
+  /**
+   * A Module Callback.
+   *
+   * @callback Bonde~ModuleCallback
+   * @this Bonde.ModuleContext
+   */
 
   /**
    * @method Bonde.registerModule
    * @param {string} moduleName
-   * @param {callback} moduleCallback
+   * @param {Bonde~ModuleCallback} moduleCallback
    */
   B.registerModule = function (moduleName, moduleCallback) {
       modules[moduleName] = moduleCallback;
@@ -170,6 +199,8 @@ var Bonde = this.Bonde || {};
   };
 
   /**
+   * Unregister all module callbacks.
+   *
    * @method Bonde.reset
    */
   B.reset = function () {
@@ -177,9 +208,12 @@ var Bonde = this.Bonde || {};
   };
 
   /**
+   * Manually apply a registered module callback to a given element.
+   *
    * @method Bonde.applyModule
    * @param {string} moduleName
-   * @param {DOMNode} element
+   * @param {DOMElement} element
+   * @returns {Bonde.ModuleContext} context in which the callback was executed.
    */
   B.applyModule = function (moduleName, element) {
       if (!modules[moduleName]) {
@@ -192,6 +226,10 @@ var Bonde = this.Bonde || {};
   };
 
   /**
+   * Applies registered module callbacks.
+   *
+   * Module callbacks are applied to Elements with `data-module`-attributes.
+   *
    * @method Bonde.scanForModules
    * @param {DOMElement} node
    */
