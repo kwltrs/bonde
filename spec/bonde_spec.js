@@ -47,7 +47,7 @@ describe('Bonde', function () {
     });
 
 
-    describe('Bonde.registeModules', function () {
+    describe('Bonde.registerModules', function () {
         beforeEach(function () {
             this.el = DOMBuilder.createElement('div');
             this.callbackA = jasmine.createSpy();

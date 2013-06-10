@@ -45,6 +45,10 @@ module.exports = function(grunt) {
         }
       }
     },
+    clean: {
+      dist: ['dist'],
+      api: ['api']
+    },
     jshint: {
       options: {
         jshintrc: '.jshintrc'
@@ -62,6 +66,14 @@ module.exports = function(grunt) {
         src: ['spec/**/*_spec.js']
       },
     },
+    jsdoc: {
+      dist: {
+        src: ['README.md', 'src/**/*.js'],
+        options: {
+          destination: 'api'
+        }
+      }
+    },
     watch: {
       gruntfile: {
         files: '<%= jshint.gruntfile.src %>',
@@ -74,7 +86,7 @@ module.exports = function(grunt) {
       spec: {
         files: '<%= jshint.spec.src %>',
         tasks: ['jshint:spec', 'jasmine']
-      },
+      }
     },
   });
 
@@ -85,8 +97,10 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-connect');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-jsdoc');
+  grunt.loadNpmTasks('grunt-contrib-clean');
 
   // Default task.
-  grunt.registerTask('default', ['jshint', 'jasmine', 'concat', 'uglify']);
+  grunt.registerTask('default', ['jshint', 'jasmine', 'concat', 'uglify', 'jsdoc']);
 
 };

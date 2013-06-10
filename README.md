@@ -1,57 +1,35 @@
 # Bonde
 
-Bonde maps JavaScript callbacks to HTML elements.
-Bonde will map page elements to registered callbacks and execute the callbacks within a facade around the targeted HTML element.
+A library to bootstrap JavaScript callbacks with a HTML document.
+
+Bonde will map page elements to registered callbacks and execute the callbacks
+within a facade around the targeted HTML element.
+
+
+## Download
+
+Download the [production version][min] or the [development version][max].
+
+[min]: http://kwltrs.github.io/bonde/dist/bonde.min.js
+[max]: http://kwltrs.github.io/bonde/dist/bonde.js
 
 
 ## Getting Started
-### In the browser
-Download the [production version][min] or the [development version][max].
 
-[min]: https://raw.github.com/kwltrs/bonde/master/dist/bonde.min.js
-[max]: https://raw.github.com/kwltrs/bonde/master/dist/bonde.js
+ * [QuickStart](http://github.com/kwltrs/bonde/blob/master/doc/QuickStart.md)
+ * [API documentation](http://kwltrs.github.io/bonde/)
+ * [bonde-rails  gem](http://github.com/kwltrs/bonde-rails)
 
-## Examples
+## Development
 
-```html
-<div data-module="foo" data-fiz="biz">
-  <h1 data-attach-to="heading">Hello</h1>
-  <p>Lorem ipsum</p>
-</div>
+Clone the git repository from [Github](http://github.com/kwltrs/bonde).
+
 ```
-
-```javascript
-var myModule = function () {
-  // ...
-};
-
-Bonde.registerModule('foo', myModule);
-
-jQuery(function () {
-  Bonde.scanForModules(document);
-});
+$ npm install
+$ grunt
+$ grunt jasmine
+$ grunt jsdoc
 ```
-
-
-
-## API
-
-### Bonde.registerModule(moduleName, callback)
-
-Register a callback with a given name.  Name can be anything that fits into a string, but it should be unique.
-
-### Bonde.registerModules(moduleMap)
-
-### Bonde.applyModule(moduleName, DOMNode)
-
-Execute a callback in context.
-
-### Bonde.scanForModules(DOMNode)
-
-### Bonde.reset()
-
-Remove all registered callbacks.
-
 
 ## Contributing
 In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [Grunt](http://gruntjs.com/).
