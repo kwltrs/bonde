@@ -74,7 +74,7 @@ module.exports = function(grunt) {
       spec: {
         files: '<%= jshint.spec.src %>',
         tasks: ['jshint:spec', 'jasmine']
-      },
+      }
     },
   });
 
