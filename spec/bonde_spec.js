@@ -297,5 +297,33 @@ describe('Bonde', function () {
             expect( Bonde.applyModule ).toHaveBeenCalledWith('modB', nodeB1);
             expect( Bonde.applyModule ).toHaveBeenCalledWith('modB', nodeB2);
         });
+
+        it('applies module callback to given dom node', function () {
+            var parentNode = DOMBuilder.createElement('div', {'data-module': 'modA'}, [
+                DOMBuilder.createElement('div'),
+                DOMBuilder.createElement('div'),
+                DOMBuilder.createElement('div')
+            ]);
+
+            spyOn(Bonde, 'applyModule');
+
+            Bonde.scanForModules( parentNode );
+
+            expect( Bonde.applyModule ).toHaveBeenCalled();
+            expect( Bonde.applyModule.callCount ).toEqual( 1 );
+
+            expect( Bonde.applyModule ).toHaveBeenCalledWith('modA', parentNode);
+        });
+
+        it('does not fail with document given', function () {
+            var error = null;
+            try {
+                Bonde.scanForModules( document );
+            } catch (e) {
+                error = e;
+            }
+
+            expect(error).toBeNull();
+        });
     });
 });
