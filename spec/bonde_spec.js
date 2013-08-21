@@ -314,5 +314,16 @@ describe('Bonde', function () {
 
             expect( Bonde.applyModule ).toHaveBeenCalledWith('modA', parentNode);
         });
+
+        it('does not fail with document given', function () {
+            var error = null;
+            try {
+                Bonde.scanForModules( document );
+            } catch (e) {
+                error = e;
+            }
+
+            expect(error).toBeNull();
+        });
     });
 });

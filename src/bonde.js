@@ -241,7 +241,7 @@ var Bonde = this.Bonde || {};
   B.scanForModules = function (node) {
       var nodes = $(node).find('[data-module]');
 
-      if ( node.hasAttribute('data-module') ) {
+      if ( node.hasAttribute && node.hasAttribute('data-module') ) {
           nodes.push(node);
       }
 
