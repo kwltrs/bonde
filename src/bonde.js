@@ -138,6 +138,12 @@ var Bonde = this.Bonde || {};
            */
           this.attr = new B.AttributeHolder();
 
+          this.$el.bondeModule = (function (ctx) {
+              return function () {
+                  return ctx;
+              };
+          }(this));
+
           attachNodes(this);
       }
 

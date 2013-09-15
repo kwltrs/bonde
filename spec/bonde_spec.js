@@ -111,6 +111,10 @@ describe('Bonde', function () {
             expect( this.moduleContext.$el.jquery ).toBeDefined();
         });
 
+        it("registers as jQuery $el.bondeModule()", function () {
+            expect( this.moduleContext.$el.bondeModule ).toBeDefined();
+            expect( this.moduleContext.$el.bondeModule() ).toBe( this.moduleContext );
+        });
 
         it("has a local selector finder", function () {
             expect( this.moduleContext.$ ).toBeFunction();
