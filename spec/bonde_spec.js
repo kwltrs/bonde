@@ -329,5 +329,29 @@ describe('Bonde', function () {
 
             expect(error).toBeNull();
         });
+
+        it('applies module callback to children before parents', function () {
+            var domTree = DOMBuilder.createElement('div', {}, [
+                DOMBuilder.createElement('div', {'data-module': 'modA'}, [
+                    DOMBuilder.createElement('div', {'data-module': 'modB'}, [
+                        DOMBuilder.createElement('div', {'data-module': 'modC'})
+                    ]),
+                ]),
+                DOMBuilder.createElement('div', {'data-module': 'modD'}, [
+                    DOMBuilder.createElement('div', {'data-module': 'modE'}),
+                    DOMBuilder.createElement('div', {'data-module': 'modF'})
+                ]),
+            ]);
+
+            var calls = [];
+
+            spyOn(Bonde, 'applyModule').andCallFake(function (modName) {
+                calls.push( modName );
+            });
+
+            Bonde.scanForModules( domTree );
+
+            expect( calls ).toEqual(['modF', 'modE', 'modD', 'modC', 'modB', 'modA']);
+        });
     });
 });

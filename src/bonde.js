@@ -9,6 +9,9 @@
 /** @namespace */
 var Bonde = this.Bonde || {};
 
+// nasty, but needed.
+jQuery.fn.reverse = [].reverse;
+
 (function(B, $) {
   'use strict';
 
@@ -251,7 +254,7 @@ var Bonde = this.Bonde || {};
           nodes.push(node);
       }
 
-      nodes.each(function () {
+      nodes.reverse().each(function () {
           var moduleName = $(this).data('module');
           B.applyModule(moduleName, this);
       });
