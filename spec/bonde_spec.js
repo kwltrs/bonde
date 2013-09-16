@@ -354,4 +354,32 @@ describe('Bonde', function () {
             expect( calls ).toEqual(['modF', 'modE', 'modD', 'modC', 'modB', 'modA']);
         });
     });
+
+    describe('submodule attachment', function () {
+        beforeEach(function () {
+            this.modCtx = null;
+            this.subModCtx = null;
+            var subModNode = DOMBuilder.createElement('div',
+                    {'data-module': 'submod', 'data-attach-to': 'mySubMod'});
+            var modNode = DOMBuilder.createElement('div', {'data-module': 'mod'}, [
+                    DOMBuilder.createElement('div', {}, [ subModNode ]) ]);
+
+            var _this = this;
+            Bonde.registerModules({
+                'mod':    function () { _this.modCtx = this; },
+                'submod': function () { _this.subModCtx = this; }
+            });
+
+            Bonde.scanForModules( modNode );
+        });
+
+        it("attaches submodules as bonde modules", function () {
+            expect( this.modCtx['mySubMod'] ).toBeDefined();
+            expect( this.modCtx.mySubMod() ).toEqual( this.subModCtx );
+        });
+
+        it("does not include submodules in attribute holder", function () {
+            expect( this.modCtx.attr.get('mySubMod') ).not.toBeDefined();
+        });
+    });
 });

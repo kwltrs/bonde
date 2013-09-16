@@ -99,7 +99,13 @@ jQuery.fn.reverse = [].reverse;
           obj.$('[data-attach-to]').each(function () {
               var $this = $(this);
               var attachName = $this.data('attach-to');
-              attachJqueryNode(obj, attachName, $this);
+              if ($this.data('module')) {
+                  obj[attachName] = function () {
+                      return $this.data('bondeModuleContext');
+                  };
+              } else {
+                  attachJqueryNode(obj, attachName, $this);
+              }
           });
       }
 
@@ -141,11 +147,11 @@ jQuery.fn.reverse = [].reverse;
            */
           this.attr = new B.AttributeHolder();
 
-          this.$el.bondeModule = (function (ctx) {
-              return function () {
-                  return ctx;
-              };
-          }(this));
+          this.$el.data('bondeModuleContext', this);
+          this.$el.bondeModule = function () {
+              return this.data('bondeModuleContext');
+          };
+
 
           attachNodes(this);
       }
