@@ -111,6 +111,10 @@ describe('Bonde', function () {
             expect( this.moduleContext.$el.jquery ).toBeDefined();
         });
 
+        it("registers as jQuery $el.bondeModule()", function () {
+            expect( this.moduleContext.$el.bondeModule ).toBeDefined();
+            expect( this.moduleContext.$el.bondeModule() ).toBe( this.moduleContext );
+        });
 
         it("has a local selector finder", function () {
             expect( this.moduleContext.$ ).toBeFunction();
@@ -296,6 +300,86 @@ describe('Bonde', function () {
             expect( Bonde.applyModule ).toHaveBeenCalledWith('modA', nodeA);
             expect( Bonde.applyModule ).toHaveBeenCalledWith('modB', nodeB1);
             expect( Bonde.applyModule ).toHaveBeenCalledWith('modB', nodeB2);
+        });
+
+        it('applies module callback to given dom node', function () {
+            var parentNode = DOMBuilder.createElement('div', {'data-module': 'modA'}, [
+                DOMBuilder.createElement('div'),
+                DOMBuilder.createElement('div'),
+                DOMBuilder.createElement('div')
+            ]);
+
+            spyOn(Bonde, 'applyModule');
+
+            Bonde.scanForModules( parentNode );
+
+            expect( Bonde.applyModule ).toHaveBeenCalled();
+            expect( Bonde.applyModule.callCount ).toEqual( 1 );
+
+            expect( Bonde.applyModule ).toHaveBeenCalledWith('modA', parentNode);
+        });
+
+        it('does not fail with document given', function () {
+            var error = null;
+            try {
+                Bonde.scanForModules( document );
+            } catch (e) {
+                error = e;
+            }
+
+            expect(error).toBeNull();
+        });
+
+        it('applies module callback to children before parents', function () {
+            var domTree = DOMBuilder.createElement('div', {}, [
+                DOMBuilder.createElement('div', {'data-module': 'modA'}, [
+                    DOMBuilder.createElement('div', {'data-module': 'modB'}, [
+                        DOMBuilder.createElement('div', {'data-module': 'modC'})
+                    ]),
+                ]),
+                DOMBuilder.createElement('div', {'data-module': 'modD'}, [
+                    DOMBuilder.createElement('div', {'data-module': 'modE'}),
+                    DOMBuilder.createElement('div', {'data-module': 'modF'})
+                ]),
+            ]);
+
+            var calls = [];
+
+            spyOn(Bonde, 'applyModule').andCallFake(function (modName) {
+                calls.push( modName );
+            });
+
+            Bonde.scanForModules( domTree );
+
+            expect( calls ).toEqual(['modF', 'modE', 'modD', 'modC', 'modB', 'modA']);
+        });
+    });
+
+    describe('submodule attachment', function () {
+        beforeEach(function () {
+            this.modCtx = null;
+            this.subModCtx = null;
+            var subModNode = DOMBuilder.createElement('div',
+                    {'data-module': 'submod', 'data-attach-to': 'mySubMod'});
+            var modNode = DOMBuilder.createElement('div', {'data-module': 'mod'}, [
+                    DOMBuilder.createElement('div', {}, [ subModNode ]) ]);
+
+            var _this = this;
+            Bonde.registerModules({
+                'mod':    function () { _this.modCtx = this; },
+                'submod': function () { _this.subModCtx = this; }
+            });
+
+            Bonde.scanForModules( modNode );
+        });
+
+        it("attaches submodules as bonde modules", function () {
+            expect( this.modCtx['mySubMod'] ).toBeDefined();
+            expect( this.modCtx.mySubMod() ).toEqual( this.subModCtx );
+        });
+
+        it("does not include submodules in attribute holder", function () {
+            expect( this.modCtx.attr.get('mySubMod') ).not.toBeDefined();
         });
     });
 });
