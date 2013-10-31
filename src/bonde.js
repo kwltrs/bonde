@@ -183,6 +183,7 @@ jQuery.fn.reverse = [].reverse;
        */
       ModuleContext.prototype.mixin = function (obj) {
           mixin(this, obj);
+          return this;
       };
 
       return ModuleContext;
